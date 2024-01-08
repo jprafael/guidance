@@ -67,3 +67,16 @@ You are a helpful assistant.
 {{~/assistant}}''')
     prompt = prompt(conversation_question='Whats is the meaning of life??')
     assert len(prompt['answer']) > 0
+
+
+def test_logprobs():
+    guidance.llm = get_llm("openai:gpt-3.5-turbo", chat_mode=True)
+    session = guidance.llm.session()
+
+    result = session(
+        prompt='<|im_start|>user\nWhat is your name?\n<|im_end|>\n\n<|im_start|>assistant\n',
+        max_tokens=1, logit_bias=None, logprobs=True, cache_seed=0, token_healing=False,
+        caching=False
+    )
+
+    assert result['choices'][0]['logprobs']['content'][0]['token'] == 'I'

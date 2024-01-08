@@ -317,7 +317,7 @@ class OpenAI(LLM):
             kwargs['messages'] = prompt_to_messages(kwargs['prompt'])
             del kwargs['prompt']
             del kwargs['echo']
-            del kwargs['logprobs']
+            # del kwargs['logprobs']
             # print(kwargs)
             out = await openai.ChatCompletion.acreate(**kwargs)
             out = add_text_to_chat_mode(out)
@@ -360,7 +360,7 @@ class OpenAI(LLM):
             data['messages'] = prompt_to_messages(data['prompt'])
             del data['prompt']
             del data['echo']
-            del data['logprobs']
+            # del data['logprobs']
 
         # Send a POST request and get the response
         # An exception for timeout is raised if the server has not issued a response for 10 seconds

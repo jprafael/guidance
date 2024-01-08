@@ -104,19 +104,20 @@ async def select(variable_name="selected", options=None, logprobs=None, list_app
             parser.program.llm.decode(current_prefix), # TODO: perhaps we should allow passing of token ids directly? (this could allow us to avoid retokenizing the whole prefix many times)
             max_tokens=1,
             logit_bias=logit_bias,
-            logprobs=len(logit_bias),
+            logprobs=True,
+            top_logprobs=len(logit_bias) if len(logit_bias) < 5 else 5,
             cache_seed=0,
             token_healing=False # we manage token boundary healing ourselves for this function
         )
         gen_obj = gen_obj["choices"][0] # get the first choice (we only asked for one)
         if "logprobs" in gen_obj:
-            logprobs_result = gen_obj["logprobs"]
+            logprobs_result = gen_obj["logprobs"]["content"]
             
             # convert the logprobs keys from string back to token ids
             top_logprobs = {}
-            for k,v in logprobs_result["top_logprobs"][0].items():
-                id = parser.program.llm.token_to_id(k)
-                top_logprobs[id] = v
+            for item in logprobs_result:
+                id = parser.program.llm.token_to_id(item['token'])
+                top_logprobs[id] = item['logprob']
         
         # this happens if LLM does not return logprobs (like an OpenAI chat model)
         else:
